@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="MCKDSDataSet1" targetNamespace="http://tempuri.org/MCKDSDataSet1.xsd" xmlns:mstns="http://tempuri.org/MCKDSDataSet1.xsd" xmlns="http://tempuri.org/MCKDSDataSet1.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="MCKDSConnectionString1" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="MCKDSConnectionString1 (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.MCKDS.Properties.Settings.GlobalReference.Default.MCKDSConnectionString1" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="ItemDetailsTableAdapter" GeneratorDataComponentClassName="ItemDetailsTableAdapter" Name="ItemDetails" UserDataComponentName="ItemDetailsTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="MCKDSConnectionString1 (Settings)" DbObjectName="MCKDS.dbo.ItemDetails" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT        id.Category, id.SubCategory, id.SubCategory + ' (' + CAST(SUM(id.Quantity * ord.Quantity) AS varchar) + ')' AS Summary
+FROM            ItemDetails AS id INNER JOIN
+                         Orders AS ord ON id.MasterProduct = ord.ItemID
+WHERE        (ord.OrderStatusID = 1) AND (id.Display = 1)
+GROUP BY id.Category, id.SubCategory
+ORDER BY id.Category</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Category" DataSetColumn="Category" />
+              <Mapping SourceColumn="SubCategory" DataSetColumn="SubCategory" />
+              <Mapping SourceColumn="Summary" DataSetColumn="Summary" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="MCKDSDataSet1" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="MCKDSDataSet1" msprop:EnableTableAdapterManager="True" msprop:Generator_DataSetName="MCKDSDataSet1">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="ItemDetails" msprop:Generator_RowClassName="ItemDetailsRow" msprop:Generator_RowEvHandlerName="ItemDetailsRowChangeEventHandler" msprop:Generator_RowDeletedName="ItemDetailsRowDeleted" msprop:Generator_RowDeletingName="ItemDetailsRowDeleting" msprop:Generator_RowEvArgName="ItemDetailsRowChangeEvent" msprop:Generator_TablePropName="ItemDetails" msprop:Generator_RowChangedName="ItemDetailsRowChanged" msprop:Generator_UserTableName="ItemDetails" msprop:Generator_RowChangingName="ItemDetailsRowChanging" msprop:Generator_TableClassName="ItemDetailsDataTable" msprop:Generator_TableVarName="tableItemDetails">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Category" msprop:Generator_UserColumnName="Category" msprop:Generator_ColumnPropNameInTable="CategoryColumn" msprop:Generator_ColumnPropNameInRow="Category" msprop:Generator_ColumnVarNameInTable="columnCategory" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SubCategory" msprop:Generator_UserColumnName="SubCategory" msprop:Generator_ColumnPropNameInTable="SubCategoryColumn" msprop:Generator_ColumnPropNameInRow="SubCategory" msprop:Generator_ColumnVarNameInTable="columnSubCategory" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Summary" msdata:ReadOnly="true" msprop:Generator_ColumnPropNameInRow="Summary" msprop:Generator_ColumnPropNameInTable="SummaryColumn" msprop:Generator_ColumnVarNameInTable="columnSummary" msprop:Generator_UserColumnName="Summary" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="83" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
