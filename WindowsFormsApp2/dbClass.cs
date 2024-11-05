@@ -21,9 +21,16 @@ namespace MCKDS
 
         //(usman Khan)
 
+        
+
         public class ItemIDs
         {
             public string ItemID { get; set; }
+        }
+        // bilal khan
+        public static void show()
+        {
+            Console.WriteLine("hello world");
         }
         public static bool GetItemIDIsFOHOnly(string pOrderid)
         {
