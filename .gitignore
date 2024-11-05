@@ -20,3 +20,4 @@
 *.suo
 /WindowsFormsApp2/bin/Debug/MCKDS.exe.config
 /WindowsFormsApp2/obj/Debug/MCKDS.TrustInfo.xml
+/.vs/TestKDS/v17/.wsuo
