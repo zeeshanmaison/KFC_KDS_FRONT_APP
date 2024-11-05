@@ -19,9 +19,7 @@ namespace MCKDS
     {
         private static string _conn = ConfigurationManager.ConnectionStrings["MCKDSConnectionString"].ConnectionString;
 
-        //(usman Khan)
-
-        
+        //(usman Khan Maison)
 
         public class ItemIDs
         {
