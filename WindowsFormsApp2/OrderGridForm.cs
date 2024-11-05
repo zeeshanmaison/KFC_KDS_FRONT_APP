@@ -22,6 +22,7 @@ namespace MCKDS
     {
         // bilal 
         private string cs = ConfigurationManager.ConnectionStrings["MCKDSConnectionString"].ConnectionString;
+        private string cs2 = ConfigurationManager.ConnectionStrings["retaildb"].ConnectionString;
 
 
         public enum ScreenSize { Screen2x3 = 6, Screen2x4 = 8 }
@@ -39,6 +40,9 @@ namespace MCKDS
         public bool HideHoldOrder;
         public bool OrderPaging = false;
 
+        // bilal 
+        public bool MOH = false;
+        public bool FOH = false;
         public OrderGridForm()
         {
             InitializeComponent();
@@ -81,7 +85,6 @@ namespace MCKDS
 
                     panSummary.Visible = true;
                     mGridSummary.Visible = true;
-
                 }
                 //
                 createOrderControls();
@@ -628,6 +631,76 @@ namespace MCKDS
 
         //-----------------------------bilal khan
 
+        public void CheckItemWiseMoh(string ItemId)
+        {
+            try
+            {
+                SqlConnection con = new SqlConnection(cs2);
+                string query = "select * from ax.RETAILINVENTTABLE where ItemId = '" + ItemId + "'";
+                SqlDataAdapter sda = new SqlDataAdapter(query, con);
+                DataTable dt = new DataTable();
+                sda.Fill(dt);
+                if(dt.Rows.Count > 0)
+                {
+                    DataRow dr = dt.Rows[0];
+                    if ( int.Parse(dr["MOH"].ToString()) == 1 )
+                    {
+                        FOH = true;  
+                    }
+                    else
+                    {
+                        MOH = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public void CheckFohOrders(string orderid)
+        {
+            try
+            {
+                SqlConnection con = new SqlConnection(cs);
+                string query = "select * from Orders where OrderId = '" +orderid+ "'";
+                SqlDataAdapter sda = new SqlDataAdapter(query, con);
+                DataTable dt = new DataTable();
+                sda.Fill(dt);
+                if(dt.Rows.Count > 0)
+                {
+                    foreach(DataRow dr in dt.Rows)
+                    {
+                        CheckItemWiseMoh(dr["ItemId"].ToString());
+                    }
+                }
+            }
+            catch (Exception ex) 
+            {
+                throw;
+            }
+        }
+
+        public void SwichToFoh(string OrderId)
+        {
+            try
+            {
+                SqlConnection con = new SqlConnection(cs);
+                string query = "update orders set OrderStatusId = 2 , OrderStatus='Expeditor' where OrderId='"+OrderId+"'";
+                con.Open();
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+
+
 
         //(usman khan)
         public void poluateOrders()
@@ -661,7 +734,7 @@ namespace MCKDS
             lblTotalOrder.Text = "Total Orders " + metroGrid1.Rows.Count.ToString();
             if (ActiveOrderCtl != null)
                 lblCurrentOrderNo.Text = "Selected Order " + ActiveOrderCtl.OrderNo;
-
+             
 
             /*
            if (ScreenDisplayOrder == null) return;
@@ -691,7 +764,7 @@ namespace MCKDS
                         isMOH = 0;
                         if (TransactionT == "36")
                         {
-                            ScreenDisplayOrder[i].SetOrderOnHold = false;
+                            ScreenDisplayOrder[i].SetOrderOnHold = true;
                         }
                         else
                         {
@@ -710,6 +783,16 @@ namespace MCKDS
                         ScreenDisplayOrder[i].OrderSource = getOrderSource(row.Cells["OrderSource"].Value.ToString());
 
                     //------------------------------------bilal khan 
+
+                    CheckFohOrders(orderId);
+
+                    if (FOH == true && MOH == false )
+                    {
+                        SwichToFoh(orderId);
+                    }
+
+                    FOH = false;
+                    MOH = false;
 
                     // bilal 
                     if (ScreenDisplayOrder[i].OrderSource == "                                                            : Source: ")
@@ -921,7 +1004,7 @@ namespace MCKDS
                         string[] stationslist = values.Split(spearator);
 
                         NextStation = GetNextStation(stationslist, OrderStatusID);
-
+                        
                         if (dbcls.BumpOrder(ActiveOrderCtl.OrderID, NextStation))
                         {
                             int milliseconds = 500;
@@ -980,27 +1063,30 @@ namespace MCKDS
                         {
                             MessageBox.Show("Message: Unable to update");
                         }
-                    }// bilal khan
-                    else if(TransactionType == 36 && OrderStatusID == 2)
+                    }
+                    else 
                     {
-                        ActiveOrderCtl.OrderBumped = true;
-                        string values = dbcls.GetConfiguration(3);
-                        char[] spearator = { ',' };
-                        string[] stationslist = values.Split(spearator);
+                        //if (TransactionType == 36 && OrderStatusID == 2)
+                        //{
+                        //    ActiveOrderCtl.OrderBumped = true;
+                        //    string values = dbcls.GetConfiguration(3);
+                        //    char[] spearator = { ',' };
+                        //    string[] stationslist = values.Split(spearator);
 
-                        NextStation = GetNextStation(stationslist, 5);
+                        //    NextStation = GetNextStation(stationslist, 5);
 
-                        if (dbcls.BumpOrder(ActiveOrderCtl.OrderID, NextStation))
-                        {
-                            int milliseconds = 600;
-                            Thread.Sleep(milliseconds);
-                            LastBumpedOrderId = ActiveOrderCtl.OrderID;
-                            this.RefreshScreen();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Message: Unable to update");
-                        }
+                        //    if (dbcls.BumpOrder(ActiveOrderCtl.OrderID, NextStation))
+                        //    {
+                        //        int milliseconds = 600;
+                        //        Thread.Sleep(milliseconds);
+                        //        LastBumpedOrderId = ActiveOrderCtl.OrderID;
+                        //        this.RefreshScreen();
+                        //    }
+                        //    else
+                        //    {
+                        //        MessageBox.Show("Message: Unable to update");
+                        //    }
+                        //}
                     }
                 }
                 catch (Exception e)
@@ -1245,9 +1331,5 @@ namespace MCKDS
             MessageBox.Show("Hey!");
         }
 
-        private void panOrders_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
     }
 }

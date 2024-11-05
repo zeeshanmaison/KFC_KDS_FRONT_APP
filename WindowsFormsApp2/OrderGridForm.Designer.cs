@@ -116,7 +116,6 @@ namespace MCKDS
             this.panOrders.VerticalScrollbarBarColor = true;
             this.panOrders.VerticalScrollbarHighlightOnWheel = false;
             this.panOrders.VerticalScrollbarSize = 10;
-            this.panOrders.Paint += new System.Windows.Forms.PaintEventHandler(this.panOrders_Paint);
             // 
             // panSummary
             // 

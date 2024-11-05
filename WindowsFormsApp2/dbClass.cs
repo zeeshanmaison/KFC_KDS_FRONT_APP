@@ -19,17 +19,11 @@ namespace MCKDS
     {
         private static string _conn = ConfigurationManager.ConnectionStrings["MCKDSConnectionString"].ConnectionString;
 
-        //(usman Khan Maison)
+        //(usman Khan)
 
         public class ItemIDs
         {
             public string ItemID { get; set; }
-        }
-        // bilal khan
-        public static void show()
-        {
-            // this is my work
-            Console.WriteLine("hello world");
         }
         public static bool GetItemIDIsFOHOnly(string pOrderid)
         {
@@ -301,9 +295,62 @@ namespace MCKDS
             {
                 return false;
             }
-
-
         }
+
+        // bilal khan 
+           private void InsertIntoBumpLog(string OrderId,int StationId)
+           {
+                try
+                {
+                    DateTime dt = DateTime.Now;        
+                    
+                    string StationName = "";
+                    if (StationId == 2)
+                    {
+                        StationName = "FOH";
+                    }
+                    else if (StationId == 3)
+                    {
+                        StationName = "Customer";
+                    }
+                    else if (StationId == 4)
+                    {
+                        StationName = "fullfilled";
+                    }
+                    SqlConnection con = Sql_Connection();
+                    string ExistOrderIdCheck = "select * from OrderBumpLog where OrderId = '" + OrderId + "'";
+                    SqlDataAdapter sda = new SqlDataAdapter(ExistOrderIdCheck, con);
+                    DataTable datatable = new DataTable();
+                    sda.Fill(datatable);
+                    if (datatable.Rows.Count > 0)
+                    {
+                        // update station by orderid
+                        string updateStation = @"update OrderBumpLog set StationID = '" + StationId + "' , StationName = '" +
+                                                 StationName+ "' where OrderId = '" + OrderId + "'";
+                        SqlCommand updatecmd = new SqlCommand(updateStation, con);
+                        updatecmd.ExecuteNonQuery();
+                        con.Close();
+                    }
+                    else
+                    {
+                        string query = @"insert into OrderBumpLog (StationID,StationName,OrderID,BumpTimeStamp)
+                                         values(@stationid,@stationname,@orderid,@bumptimestamp)";
+                        SqlCommand cmd = new SqlCommand(query, con);
+                        cmd.Parameters.AddWithValue("@stationid", StationId);
+                        cmd.Parameters.AddWithValue("@stationname", StationName);
+                        cmd.Parameters.AddWithValue("@orderid", OrderId);
+                        cmd.Parameters.AddWithValue("@bumptimestamp", dt);
+                        cmd.ExecuteNonQuery();
+                        con.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+           }
+        // -- end section bilal khan 
+
         private bool UpdateOrdertoNextStatus(string pOrderid, int NextStation)
         {
             try
@@ -339,7 +386,7 @@ namespace MCKDS
 
                     SqlCommand sql_cmd2 = new SqlCommand(query2, sql_con);
                     sql_cmd2.ExecuteNonQuery();
-
+                    InsertIntoBumpLog(pOrderid, NextStation);
                 }
                 return true;
             }
